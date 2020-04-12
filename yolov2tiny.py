@@ -22,12 +22,14 @@ class YOLO_V2_TINY(object):
         #
         # Your code from here. You may clear the comments.
         #
-        print('build_graph is not yet implemented')
-        sys.exit()
+        
 
         # Load weight parameters from a pickle file.
-
-
+        with open(self.weight_pickle, 'rb') as model_path:
+            pretrained_model = pickle.load(model_path)
+        
+        # print('build_graph is not yet implemented')
+        # sys.exit()
         # Create an empty list for tensors.
         tensor_list = []
 
@@ -41,6 +43,30 @@ class YOLO_V2_TINY(object):
         # build a graph and append the tensors to the returning list for computing intermediate
         # values. One tip is to start adding a placeholder tensor for the first tensor.
         # (Use 1e-5 for the epsilon value of batch normalization layers.)
+        with self.g.as_default():
+            with self.g.device(self.proc):
+                # epsilon = tf.constant(1e-5)
+                epsilon = 1e-5
+                input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
+                tensor_list.append(input_tensor)
+                for i in range(len(pretrained_model)):
+                    # for k, layer in pretrained_model[i].items():
+                    conv = tf.nn.conv2d(
+                        input_tensor,
+                        pretrained_model[i]["kernel"],
+                        name = "Conv{}".format(i)
+                    )
+                    batch_norm = tf.nn.batch_normalization(
+                        conv,
+                        pretrained_model[i].get("moving_mean", 0),
+                        pretrained_model[i].get("moving_variance", 0),
+                        pretrained_model[i].get("biases", 0),
+                        pretrained_model[i].get("gamma", 0),
+                        epsilon,
+                        name = "BN{}".format(i)
+                    )
+                    tensor_list.append(conv)
+                    tensor_list.append(batch_norm)
 
 
         # Return the start tensor and the list of all tensors.

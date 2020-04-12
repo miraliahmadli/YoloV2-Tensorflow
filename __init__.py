@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import cv2 as cv2
 import time
-import yolov2tiny
+from yolov2tiny import YOLO_V2_TINY, postprocessing
 
 def open_video_with_opencv(in_video_path, out_video_path):
     #
@@ -10,17 +10,29 @@ def open_video_with_opencv(in_video_path, out_video_path):
     #
     # Your code from here. You may clear the comments.
     #
-    print('open_video_with_opencv is not yet implemented')
-    sys.exit()
+    #print('open_video_with_opencv is not yet implemented')
+    #sys.exit() 
 
     # Open an object of input video using cv2.VideoCapture.
+    input_video = cv2.VideoCapture(in_video_path)    
 
+    # if input_video.isOpened(): 
+    #     # get input_video property 
+    #     width  = input_video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)  # float
+    #     height = input_video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT) # float
+
+    #     # or
+    #     width  = input_video.get(3) # float
+    #     height = input_video.get(4) # float
+
+    #     # it gives me 0.0 :/
+    #     fps = input_video.get(cv2.cv.CV_CAP_PROP_FPS)
 
     # Open an object of output video using cv2.VideoWriter.
-
+    output_video = cv2.VideoWriter(out_video_path,cv2.VideoWriter_fourcc(*'MP4V'), 10.0, (416, 416))
 
     # Return the video objects and anything you want for further process.
-
+    return input_video, output_video
 
 def resize_input(im):
     imsz = cv2.resize(im, (416, 416))
@@ -38,14 +50,17 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     sys.exit()
 
     # Open video using open_video_with_opencv.
-
+    input_video, output_video = open_video_with_opencv(in_video_path, out_video_path)
+    in_shape = (1, 416, 416, 3)
+    pcikle_path = "./y2t_weights.pickle"
 
     # Check if video is opened. Otherwise, exit.
-
-
+    if not input_video.isOpened():
+        print('video is not opened')
+        sys.exit()
     # Create an instance of the YOLO_V2_TINY class. Pass the dimension of
     # the input, a path to weight file, and which device you will use as arguments.
-
+    model = YOLO_V2_TINY(in_shape, pcikle_path, proc)
 
     # Start the main loop. For each frame of the video, the loop must do the followings:
     # 1. Do the inference.
@@ -56,8 +71,23 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     # 4. Save the intermediate values for the first layer.
     # Note that your input must be adjusted to fit into the algorithm,
     # including resizing the frame and changing the dimension.
+    while True:
+        ret, img = input_video.read()
+        if not ret:
+            continue
+        img = resize_input(img)
+        print(img.shape)
 
+        start = time.time()
+        output_tensors = model.inference(img)
+        end = time.time()
+        elapsed_time = end-start
+        print("Elapsed time to run inference: {}".format(elapsed_time))
 
+        print("\n\nLength and type", len(output_tensors), type(output_tensors))
+        break
+
+        label_boxes = postprocessing(output_tensors[-1])
     # Check the inference peformance; end-to-end elapsed time and inferencing time.
     # Check how many frames are processed per second respectivly.
     
