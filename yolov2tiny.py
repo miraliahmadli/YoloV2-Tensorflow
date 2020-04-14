@@ -49,15 +49,19 @@ class YOLO_V2_TINY(object):
                 epsilon = 1e-5
                 input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
                 tensor_list.append(input_tensor)
+                x = input_tensor
                 for i in range(len(pretrained_model)):
                     # for k, layer in pretrained_model[i].items():
                     conv = tf.nn.conv2d(
-                        input_tensor,
+                        x,
                         pretrained_model[i]["kernel"],
                         name = "Conv{}".format(i)
                     )
+                    tensor_list.append(conv)
+                    x = conv
+
                     batch_norm = tf.nn.batch_normalization(
-                        conv,
+                        x,
                         pretrained_model[i].get("moving_mean", 0),
                         pretrained_model[i].get("moving_variance", 0),
                         pretrained_model[i].get("biases", 0),
@@ -65,8 +69,8 @@ class YOLO_V2_TINY(object):
                         epsilon,
                         name = "BN{}".format(i)
                     )
-                    tensor_list.append(conv)
                     tensor_list.append(batch_norm)
+                    x = batch_norm
 
 
         # Return the start tensor and the list of all tensors.
