@@ -8,9 +8,8 @@ RUN apt-get install -y build-essential wget python3 python3-pip python3-dev git 
 
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install setuptools numpy==1.16.4 opencv-python cython tensorflow-gpu==1.15.2 networkx
-RUN python3 -m pip install --upgrade setuptools
-# RUN python3 -m pip uninstall -y setuptools
-# RUN python3 -m pip install setuptools
+RUN python3 -m pip uninstall -y setuptools
+RUN python3 -m pip install setuptools
 
 RUN mkdir /home/cs492
 COPY conf/.tmux.conf /root
