@@ -46,13 +46,13 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     #
     # Your code from here. You may clear the comments.
     #
-    print('video_object_detection is not yet implemented')
-    sys.exit()
+    # print('video_object_detection is not yet implemented')
+    # sys.exit()
 
     # Open video using open_video_with_opencv.
     input_video, output_video = open_video_with_opencv(in_video_path, out_video_path)
     in_shape = (1, 416, 416, 3)
-    pcikle_path = "./y2t_weights.pickle"
+    pickle_path = "./y2t_weights.pickle"
 
     # Check if video is opened. Otherwise, exit.
     if not input_video.isOpened():
@@ -60,7 +60,7 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
         sys.exit()
     # Create an instance of the YOLO_V2_TINY class. Pass the dimension of
     # the input, a path to weight file, and which device you will use as arguments.
-    model = YOLO_V2_TINY(in_shape, pcikle_path, proc)
+    model = YOLO_V2_TINY(in_shape, pickle_path, proc)
 
     # Start the main loop. For each frame of the video, the loop must do the followings:
     # 1. Do the inference.
