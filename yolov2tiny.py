@@ -201,6 +201,7 @@ class YOLO_V2_TINY(object):
                     padding = "SAME",
                     name = "Conv{}".format(i)
                 )
+                conv = tf.nn.bias_add(conv, pretrained_model[8]["biases"])
                 tensor_list.append(conv)
                 x = conv
 
