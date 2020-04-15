@@ -50,11 +50,13 @@ class YOLO_V2_TINY(object):
                 input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
                 tensor_list.append(input_tensor)
                 x = input_tensor
-                for i in range(len(pretrained_model)):
-                    # for k, layer in pretrained_model[i].items():
+
+                for i in range(5):
                     conv = tf.nn.conv2d(
-                        x,
-                        pretrained_model[i]["kernel"],
+                        input = x,
+                        filter = pretrained_model[i]["kernel"],
+                        strides = 1,
+                        padding = "SAME",
                         name = "Conv{}".format(i)
                     )
                     tensor_list.append(conv)
@@ -62,16 +64,145 @@ class YOLO_V2_TINY(object):
 
                     batch_norm = tf.nn.batch_normalization(
                         x,
-                        pretrained_model[i].get("moving_mean", 0),
-                        pretrained_model[i].get("moving_variance", 0),
-                        pretrained_model[i].get("biases", 0),
-                        pretrained_model[i].get("gamma", 0),
-                        epsilon,
+                        mean = pretrained_model[i]["moving_mean"],
+                        variance = pretrained_model[i]["moving_variance"],
+                        offset = pretrained_model[i]["biases"],
+                        scale = pretrained_model[i]["gamma"],
+                        variance_epsilon = epsilon,
                         name = "BN{}".format(i)
                     )
                     tensor_list.append(batch_norm)
                     x = batch_norm
 
+                    leaky_relu = tf.nn.leaky_relu(
+                        x,
+                        name = "Leaky_{}".format(i),
+                    )
+                    tensor_list.append(leaky_relu)
+                    x = leaky_relu
+
+                    max_pool = tf.nn.max_pool2d(
+                        input=x,
+                        ksize = 2,
+                        strides = 2,
+                        padding =  "VALID",
+                        data_format='NHWC',
+                        name="pool_{}".format(i),
+                    )
+                    tensor_list.append(max_pool)
+                    x = max_pool
+            
+                # 6th layer
+                conv = tf.nn.conv2d(
+                    input = x,
+                    filter = pretrained_model[5]["kernel"],
+                    strides = 1,
+                    padding = "SAME",
+                    name = "Conv{}".format(i)
+                )
+                tensor_list.append(conv)
+                x = conv
+
+                batch_norm = tf.nn.batch_normalization(
+                    x,
+                    mean = pretrained_model[5]["moving_mean"],
+                    variance = pretrained_model[5]["moving_variance"],
+                    offset = pretrained_model[5]["biases"],
+                    scale = pretrained_model[5]["gamma"],
+                    variance_epsilon = epsilon,
+                    name = "BN{}".format(5)
+                )
+                tensor_list.append(batch_norm)
+                x = batch_norm
+
+                leaky_relu = tf.nn.leaky_relu(
+                    x,
+                    name = "Leaky_{}".format(5),
+                )
+                tensor_list.append(leaky_relu)
+                x = leaky_relu
+
+                max_pool = tf.nn.max_pool2d(
+                    input=x,
+                    ksize = 2,
+                    strides = 1,
+                    padding =  "SAME",
+                    data_format='NHWC',
+                    name="pool_{}".format(5),
+                )
+                tensor_list.append(max_pool)
+                x = max_pool
+
+                # 7th layer
+                conv = tf.nn.conv2d(
+                    input = x,
+                    filter = pretrained_model[6]["kernel"],
+                    strides = 1,
+                    padding = "SAME",
+                    name = "Conv{}".format(i)
+                )
+                tensor_list.append(conv)
+                x = conv
+
+                batch_norm = tf.nn.batch_normalization(
+                    x,
+                    mean = pretrained_model[6]["moving_mean"],
+                    variance = pretrained_model[6]["moving_variance"],
+                    offset = pretrained_model[6]["biases"],
+                    scale = pretrained_model[6]["gamma"],
+                    variance_epsilon = epsilon,
+                    name = "BN{}".format(6)
+                )
+                tensor_list.append(batch_norm)
+                x = batch_norm
+
+                leaky_relu = tf.nn.leaky_relu(
+                    x,
+                    name = "Leaky_{}".format(6),
+                )
+                tensor_list.append(leaky_relu)
+                x = leaky_relu
+
+                # 8th layer
+                conv = tf.nn.conv2d(
+                    input = x,
+                    filter = pretrained_model[7]["kernel"],
+                    strides = 1,
+                    padding = "SAME",
+                    name = "Conv{}".format(i)
+                )
+                tensor_list.append(conv)
+                x = conv
+
+                batch_norm = tf.nn.batch_normalization(
+                    x,
+                    mean = pretrained_model[7]["moving_mean"],
+                    variance = pretrained_model[7]["moving_variance"],
+                    offset = pretrained_model[7]["biases"],
+                    scale = pretrained_model[7]["gamma"],
+                    variance_epsilon = epsilon,
+                    name = "BN{}".format(7)
+                )
+                tensor_list.append(batch_norm)
+                x = batch_norm
+
+                leaky_relu = tf.nn.leaky_relu(
+                    x,
+                    name = "Leaky_{}".format(7),
+                )
+                tensor_list.append(leaky_relu)
+                x = leaky_relu
+            
+                # 9th layer
+                conv = tf.nn.conv2d(
+                    input = x,
+                    filter = pretrained_model[8]["kernel"],
+                    strides = 1,
+                    padding = "SAME",
+                    name = "Conv{}".format(i)
+                )
+                tensor_list.append(conv)
+                x = conv
 
         # Return the start tensor and the list of all tensors.
         return input_tensor, tensor_list

@@ -38,6 +38,10 @@ def resize_input(im):
     imsz = cv2.resize(im, (416, 416))
     imsz = imsz / 255.
     imsz = imsz[:,:,::-1]
+    
+    # resize img
+    imsz = np.array(imsz).reshape(1, 416, 416, 3)
+
     return np.asarray(imsz, dtype=np.float32)
 
 def video_object_detection(in_video_path, out_video_path, proc="cpu"):
