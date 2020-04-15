@@ -29,7 +29,8 @@ def open_video_with_opencv(in_video_path, out_video_path):
     #     fps = input_video.get(cv2.cv.CV_CAP_PROP_FPS)
 
     # Open an object of output video using cv2.VideoWriter.
-    output_video = cv2.VideoWriter(out_video_path,cv2.VideoWriter_fourcc(*'MP4V'), 10.0, (416, 416))
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    output_video = cv2.VideoWriter(out_video_path, -1, 30.0, (416, 416))
 
     # Return the video objects and anything you want for further process.
     return input_video, output_video
@@ -38,11 +39,16 @@ def resize_input(im):
     imsz = cv2.resize(im, (416, 416))
     imsz = imsz / 255.
     imsz = imsz[:,:,::-1]
-    
+
     # resize img
     imsz = np.array(imsz).reshape(1, 416, 416, 3)
 
     return np.asarray(imsz, dtype=np.float32)
+
+def recover_input(im):
+    img = im[:,:,::-1]
+    img = (img*255).astype(np.uint8)
+    return img
 
 def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     #
@@ -57,6 +63,7 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     input_video, output_video = open_video_with_opencv(in_video_path, out_video_path)
     in_shape = (1, 416, 416, 3)
     pickle_path = "./y2t_weights.pickle"
+    total_elapsed_time = 0
 
     # Check if video is opened. Otherwise, exit.
     if not input_video.isOpened():
@@ -78,23 +85,32 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     while True:
         ret, img = input_video.read()
         if not ret:
-            continue
+            break
         img = resize_input(img)
-        print(img.shape)
 
         start = time.time()
         output_tensors = model.inference(img)
+        output_tensor = output_tensors[-1]
         end = time.time()
         elapsed_time = end-start
-        print("Elapsed time to run inference: {}".format(elapsed_time))
+        total_elapsed_time += elapsed_time
+        # print("Elapsed time to run inference: {}".format(elapsed_time))
 
-        print("\n\nLength and type", len(output_tensors), type(output_tensors))
-        break
+        label_boxes = postprocessing(output_tensor)
+        img = recover_input(img)
+        for cl, lt, rb, col in label_boxes:
 
-        label_boxes = postprocessing(output_tensors[-1])
+            cv2.rectangle(img,lt, rb,col,3)
+            cv2.putText(img,cl,lt,cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
+        output_video.write(img)
     # Check the inference peformance; end-to-end elapsed time and inferencing time.
     # Check how many frames are processed per second respectivly.
+    length = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
     
+    input_video.release()
+    output_video.release()
+    performance = length / elapsed_time * 1000
+    print(performance)
 
     # Release the opened videos.
     
