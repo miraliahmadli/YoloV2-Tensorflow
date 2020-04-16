@@ -103,7 +103,7 @@ class YOLO_V2_TINY(object):
                     filter = pretrained_model[5]["kernel"],
                     strides = 1,
                     padding = "SAME",
-                    name = "Conv{}".format(i)
+                    name = "Conv{}".format(5)
                 )
                 tensor_list.append(conv)
                 x = conv
@@ -145,7 +145,7 @@ class YOLO_V2_TINY(object):
                     filter = pretrained_model[6]["kernel"],
                     strides = 1,
                     padding = "SAME",
-                    name = "Conv{}".format(i)
+                    name = "Conv{}".format(6)
                 )
                 tensor_list.append(conv)
                 x = conv
@@ -176,7 +176,7 @@ class YOLO_V2_TINY(object):
                     filter = pretrained_model[7]["kernel"],
                     strides = 1,
                     padding = "SAME",
-                    name = "Conv{}".format(i)
+                    name = "Conv{}".format(7)
                 )
                 tensor_list.append(conv)
                 x = conv
@@ -207,7 +207,7 @@ class YOLO_V2_TINY(object):
                     filter = pretrained_model[8]["kernel"],
                     strides = 1,
                     padding = "SAME",
-                    name = "Conv{}".format(i)
+                    name = "Conv{}".format(8)
                 )
                 conv = tf.nn.bias_add(conv, pretrained_model[8]["biases"])
                 tensor_list.append(conv)
