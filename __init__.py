@@ -49,7 +49,7 @@ def resize_input(im):
 
 def recover_input(im, dim):
     img = np.array(im).reshape(416, 416, 3)
-    # img = img[:,:,::-1]
+    img = img[:,:,::-1]
     img = (img*255).astype(np.uint8)
     # img = cv2.resize(img, dim)
     return img
@@ -114,7 +114,6 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
             cv2.rectangle(img, (x1, y1), (x2, y2), col, 3)
             cv2.putText(img, cl, (x1, y1), cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
         img = cv2.resize(img, dim)
-        # img = img[:,:,::-1]
         output_video.write(img)
 
 
