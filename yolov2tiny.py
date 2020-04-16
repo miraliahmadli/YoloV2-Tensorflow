@@ -49,10 +49,12 @@ class YOLO_V2_TINY(object):
             with self.g.device(self.proc):
                 # epsilon = tf.constant(1e-5)
                 epsilon = 1e-5
+                alpha = 0.1
                 input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
                 tensor_list.append(input_tensor)
                 x = input_tensor
 
+                # first 5 layers
                 for i in range(5):
                     conv = tf.nn.conv2d(
                         input = x,
@@ -79,6 +81,7 @@ class YOLO_V2_TINY(object):
                     leaky_relu = tf.nn.leaky_relu(
                         x,
                         name = "Leaky_{}".format(i),
+                        alpha = alpha,
                     )
                     tensor_list.append(leaky_relu)
                     x = leaky_relu
@@ -120,6 +123,7 @@ class YOLO_V2_TINY(object):
                 leaky_relu = tf.nn.leaky_relu(
                     x,
                     name = "Leaky_{}".format(5),
+                    alpha = alpha,
                 )
                 tensor_list.append(leaky_relu)
                 x = leaky_relu
@@ -161,6 +165,7 @@ class YOLO_V2_TINY(object):
                 leaky_relu = tf.nn.leaky_relu(
                     x,
                     name = "Leaky_{}".format(6),
+                    alpha = alpha,
                 )
                 tensor_list.append(leaky_relu)
                 x = leaky_relu
@@ -191,6 +196,7 @@ class YOLO_V2_TINY(object):
                 leaky_relu = tf.nn.leaky_relu(
                     x,
                     name = "Leaky_{}".format(7),
+                    alpha = alpha,
                 )
                 tensor_list.append(leaky_relu)
                 x = leaky_relu

@@ -29,11 +29,13 @@ def open_video_with_opencv(in_video_path, out_video_path):
     #     fps = input_video.get(cv2.cv.CV_CAP_PROP_FPS)
 
     # Open an object of output video using cv2.VideoWriter.
+    width  = int(input_video.get(3))
+    height = int(input_video.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    output_video = cv2.VideoWriter(out_video_path, fourcc, 30.0, (416, 416))
+    output_video = cv2.VideoWriter(out_video_path, fourcc, 30.0, (width, height))
 
     # Return the video objects and anything you want for further process.
-    return input_video, output_video
+    return input_video, output_video, (width, height)
 
 def resize_input(im):
     imsz = cv2.resize(im, (416, 416))
@@ -45,10 +47,11 @@ def resize_input(im):
 
     return np.asarray(imsz, dtype=np.float32)
 
-def recover_input(im):
-    # img = im[:,:,::-1]
+def recover_input(im, dim):
     img = np.array(im).reshape(416, 416, 3)
+    # img = img[:,:,::-1]
     img = (img*255).astype(np.uint8)
+    # img = cv2.resize(img, dim)
     return img
 
 def video_object_detection(in_video_path, out_video_path, proc="cpu"):
@@ -61,10 +64,12 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     # sys.exit()
 
     # Open video using open_video_with_opencv.
-    input_video, output_video = open_video_with_opencv(in_video_path, out_video_path)
+    input_video, output_video, dim = open_video_with_opencv(in_video_path, out_video_path)
     in_shape = (1, 416, 416, 3)
     pickle_path = "./y2t_weights.pickle"
     total_elapsed_time = 0
+    # scale_w = dim[0] / 416
+    # scale_h = dim[1] / 416
 
     # Check if video is opened. Otherwise, exit.
     if not input_video.isOpened():
@@ -98,11 +103,21 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
         # print("Elapsed time to run inference: {}".format(elapsed_time))
 
         label_boxes = postprocessing(output_tensor)
-        img = recover_input(img)
-        for cl, lt, rb, col in label_boxes:
-            cv2.rectangle(img,lt, rb,col,3)
-            cv2.putText(img,cl,lt,cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
+        # print(len(label_boxes))
+        img = recover_input(img, dim)
+        for cl, (x1, y1), (x2, y2), col in  label_boxes:
+            # cl, (x1, y1), (x2, y2), col = label_boxes
+            # x1 = int(x1*scale_w)
+            # y1 = int(y1*scale_h)
+            # x2 = int(x2*scale_w)
+            # y2 = int(y2*scale_h)
+            cv2.rectangle(img, (x1, y1), (x2, y2), col, 3)
+            cv2.putText(img, cl, (x1, y1), cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
+        img = cv2.resize(img, dim)
+        # img = img[:,:,::-1]
         output_video.write(img)
+
+
     # Check the inference peformance; end-to-end elapsed time and inferencing time.
     # Check how many frames are processed per second respectivly.
     length = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
