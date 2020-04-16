@@ -29,8 +29,8 @@ def open_video_with_opencv(in_video_path, out_video_path):
     #     fps = input_video.get(cv2.cv.CV_CAP_PROP_FPS)
 
     # Open an object of output video using cv2.VideoWriter.
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    output_video = cv2.VideoWriter(out_video_path, -1, 30.0, (416, 416))
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    output_video = cv2.VideoWriter(out_video_path, fourcc, 30.0, (416, 416))
 
     # Return the video objects and anything you want for further process.
     return input_video, output_video
@@ -46,7 +46,8 @@ def resize_input(im):
     return np.asarray(imsz, dtype=np.float32)
 
 def recover_input(im):
-    img = im[:,:,::-1]
+    # img = im[:,:,::-1]
+    img = np.array(im).reshape(416, 416, 3)
     img = (img*255).astype(np.uint8)
     return img
 
@@ -99,7 +100,6 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
         label_boxes = postprocessing(output_tensor)
         img = recover_input(img)
         for cl, lt, rb, col in label_boxes:
-
             cv2.rectangle(img,lt, rb,col,3)
             cv2.putText(img,cl,lt,cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
         output_video.write(img)
