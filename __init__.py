@@ -119,11 +119,12 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
 
     # Check the inference peformance; end-to-end elapsed time and inferencing time.
     # Check how many frames are processed per second respectivly.
-    length = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
-    
+    # length = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = input_video.get(5)
+
     input_video.release()
     output_video.release()
-    performance = length / elapsed_time * 1000
+    performance = fps / total_elapsed_time * 1000
     print(performance)
 
     # Release the opened videos.
