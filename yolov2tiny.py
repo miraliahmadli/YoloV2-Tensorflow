@@ -49,7 +49,8 @@ class YOLO_V2_TINY(object):
             with self.g.device(self.proc):
                 # epsilon = tf.constant(1e-5)
                 epsilon = 1e-5
-                alpha = 0.1
+                # epsilon = 0.000009999999747378752
+                alpha = 0.10000000149011612
                 input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
                 tensor_list.append(input_tensor)
                 x = input_tensor

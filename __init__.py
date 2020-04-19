@@ -105,13 +105,13 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
         label_boxes = postprocessing(output_tensor)
         # print(len(label_boxes))
         img = recover_input(img, dim)
-        for cl, (x1, y1), (x2, y2), col in  label_boxes:
+        for cl, (x1, y1), (x2, y2), (b, g, r) in  label_boxes:
             # cl, (x1, y1), (x2, y2), col = label_boxes
             # x1 = int(x1*scale_w)
             # y1 = int(y1*scale_h)
             # x2 = int(x2*scale_w)
             # y2 = int(y2*scale_h)
-            cv2.rectangle(img, (x1, y1), (x2, y2), col, 3)
+            cv2.rectangle(img, (x1, y1), (x2, y2), (r, g, b), 3)
             cv2.putText(img, cl, (x1, y1), cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
         img = cv2.resize(img, dim)
         output_video.write(img)
@@ -124,8 +124,9 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
 
     input_video.release()
     output_video.release()
-    performance = fps / total_elapsed_time * 1000
-    print(performance)
+    performance = fps / (total_elapsed_time * 1000)
+    print("Total elapsed time for running inference: {}".format(total_elapsed_time))
+    print("FPS processed per second: {}".format(performance))
 
     # Release the opened videos.
     
