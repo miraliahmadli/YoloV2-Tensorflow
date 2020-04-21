@@ -29,10 +29,11 @@ def open_video_with_opencv(in_video_path, out_video_path):
     #     fps = input_video.get(cv2.cv.CV_CAP_PROP_FPS)
 
     # Open an object of output video using cv2.VideoWriter.
+    fps = input_video.get(5)
     width  = int(input_video.get(3))
     height = int(input_video.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    output_video = cv2.VideoWriter(out_video_path, fourcc, 30.0, (width, height))
+    output_video = cv2.VideoWriter(out_video_path, fourcc, fps, (width, height))
 
     # Return the video objects and anything you want for further process.
     return input_video, output_video, (width, height)
