@@ -50,9 +50,10 @@ class YOLO_V2_TINY(object):
                 # epsilon = tf.constant(1e-5)
                 epsilon = 1e-5
                 # epsilon = 0.000009999999747378752
-                alpha = 0.10000000149011612
+                # alpha = 0.10000000149011612
+                alpha = 0.1
                 input_tensor = tf.placeholder(tf.float32, shape=in_shape, name='input')
-                tensor_list.append(input_tensor)
+                # tensor_list.append(input_tensor)
                 x = input_tensor
 
                 # first 5 layers
@@ -67,11 +68,16 @@ class YOLO_V2_TINY(object):
                     tensor_list.append(conv)
                     x = conv
 
+                    bias = tf.nn.bias_add(x, pretrained_model[i]["biases"])
+                    tensor_list.append(bias)
+                    x = bias
+
                     batch_norm = tf.nn.batch_normalization(
                         x,
                         mean = pretrained_model[i]["moving_mean"],
                         variance = pretrained_model[i]["moving_variance"],
-                        offset = pretrained_model[i]["biases"],
+                        offset = None,
+                        # offset = pretrained_model[i]["biases"],
                         scale = pretrained_model[i]["gamma"],
                         variance_epsilon = epsilon,
                         name = "BN{}".format(i)
@@ -108,12 +114,17 @@ class YOLO_V2_TINY(object):
                 )
                 tensor_list.append(conv)
                 x = conv
-
+                
+                bias = tf.nn.bias_add(x, pretrained_model[5]["biases"])
+                tensor_list.append(bias)
+                x = bias
+                
                 batch_norm = tf.nn.batch_normalization(
                     x,
                     mean = pretrained_model[5]["moving_mean"],
                     variance = pretrained_model[5]["moving_variance"],
-                    offset = pretrained_model[5]["biases"],
+                    offset = None,
+                    # offset = pretrained_model[5]["biases"],
                     scale = pretrained_model[5]["gamma"],
                     variance_epsilon = epsilon,
                     name = "BN{}".format(5)
@@ -150,12 +161,17 @@ class YOLO_V2_TINY(object):
                 )
                 tensor_list.append(conv)
                 x = conv
-
+                
+                bias = tf.nn.bias_add(x, pretrained_model[6]["biases"])
+                tensor_list.append(bias)
+                x = bias
+                
                 batch_norm = tf.nn.batch_normalization(
                     x,
                     mean = pretrained_model[6]["moving_mean"],
                     variance = pretrained_model[6]["moving_variance"],
-                    offset = pretrained_model[6]["biases"],
+                    offset = None,
+                    # offset = pretrained_model[6]["biases"],
                     scale = pretrained_model[6]["gamma"],
                     variance_epsilon = epsilon,
                     name = "BN{}".format(6)
@@ -182,11 +198,16 @@ class YOLO_V2_TINY(object):
                 tensor_list.append(conv)
                 x = conv
 
+                bias = tf.nn.bias_add(x, pretrained_model[7]["biases"])
+                tensor_list.append(bias)
+                x = bias
+
                 batch_norm = tf.nn.batch_normalization(
                     x,
                     mean = pretrained_model[7]["moving_mean"],
                     variance = pretrained_model[7]["moving_variance"],
-                    offset = pretrained_model[7]["biases"],
+                    offset = None,
+                    # offset = pretrained_model[7]["biases"],
                     scale = pretrained_model[7]["gamma"],
                     variance_epsilon = epsilon,
                     name = "BN{}".format(7)

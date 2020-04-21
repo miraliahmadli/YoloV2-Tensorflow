@@ -78,6 +78,7 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     # Create an instance of the YOLO_V2_TINY class. Pass the dimension of
     # the input, a path to weight file, and which device you will use as arguments.
     model = YOLO_V2_TINY(in_shape, pickle_path, proc)
+    first = True
 
     # Start the main loop. For each frame of the video, the loop must do the followings:
     # 1. Do the inference.
@@ -96,6 +97,10 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
 
         start = time.time()
         output_tensors = model.inference(img)
+        if first:
+            first = False
+            for i, tensor in enumerate(output_tensors):
+                np.save("./intermediate/layer_{}.npy".format(i+1), tensor)
         output_tensor = output_tensors[-1]
         end = time.time()
         elapsed_time = end-start
@@ -121,15 +126,13 @@ def video_object_detection(in_video_path, out_video_path, proc="cpu"):
     # Check how many frames are processed per second respectivly.
     # length = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = input_video.get(5)
-
-    input_video.release()
-    output_video.release()
-    performance = fps / (total_elapsed_time * 1000)
+    performance = fps / total_elapsed_time
     print("Total elapsed time for running inference: {}".format(total_elapsed_time))
     print("FPS processed per second: {}".format(performance))
 
     # Release the opened videos.
-    
+    input_video.release()
+    output_video.release()
 
 def main():
     if len(sys.argv) < 3:
